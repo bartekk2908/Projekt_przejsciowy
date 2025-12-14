@@ -1,6 +1,5 @@
 import os
 import glob
-
 import pandas as pd
 
 from data_download import data_download
@@ -42,7 +41,7 @@ def load_and_preprocess_data(data_path):
 def save_preprocessed_data(df):
     current_dir = os.path.dirname(os.path.abspath(__file__))
     project_root = os.path.dirname(current_dir)
-    data_dir = os.path.join(project_root, 'data')
+    data_dir = os.path.join(project_root, 'data', 'processed')
 
     # Tworzymy folder data jeśli nie istnieje
     if not os.path.exists(data_dir):
