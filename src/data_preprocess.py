@@ -5,8 +5,8 @@ import pandas as pd
 from data_download import data_download
 
 
-
 def load_and_preprocess_data(data_path):
+    """ Funkcja wczytuje dane ze ścieżki, scala je i wstępnie obrabia oraz zwraca obiekt data frame. """
     
     # Ignorujemy 'apartments_rent_pl...', interesują nas pliki 'apartments_pl_...'
     search_pattern = os.path.join(data_path, "apartments_pl_*.csv")
@@ -24,9 +24,15 @@ def load_and_preprocess_data(data_path):
     full_df.drop_duplicates(subset=['id'], keep='last', inplace=True)
     print(f"Usunięto {initial_count - len(full_df)} duplikatów.\nPozostało {len(full_df)} unikalnych ofert.")
 
-    # Formatowanie typów danych pod XGBoost / LightGBM
+    # Obsłużenie kolumn binarnych (zamiana tekstu 'yes'/'no' na liczby 1/0)
+    binary_cols = ['hasParkingSpace', 'hasBalcony', 'hasElevator', 'hasSecurity', 'hasStorageRoom']
+    for col in binary_cols:
+        if col in full_df.columns:
+            full_df[col] = full_df[col].map({'yes': 1, 'no': 0})
+            full_df[col] = full_df[col].astype(float)
+
     # Wybieramy kluczowe kolumny kategoryczne
-    categorical_cols = ['city', 'type', 'ownership', 'condition', 'buildingMaterial']
+    categorical_cols = ['city', 'type', 'ownership', 'buildingMaterial', 'condition']
     
     for col in categorical_cols:
         if col in full_df.columns:
@@ -39,6 +45,8 @@ def load_and_preprocess_data(data_path):
 
 
 def save_preprocessed_data(df):
+    """ Funkcja zapisuje data frame do 'data/processed/dataset.parquet'. """
+
     current_dir = os.path.dirname(os.path.abspath(__file__))
     project_root = os.path.dirname(current_dir)
     data_dir = os.path.join(project_root, 'data', 'processed')
@@ -56,6 +64,7 @@ def save_preprocessed_data(df):
 
 if __name__ == "__main__":
 
+    # https://www.kaggle.com/datasets/krzysztofjamroz/apartment-prices-in-poland/code
     path = data_download("krzysztofjamroz/apartment-prices-in-poland")
 
     df = load_and_preprocess_data(path)

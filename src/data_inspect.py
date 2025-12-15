@@ -24,4 +24,4 @@ if os.path.exists(data_path):
     print(df.head(3))
 
 else:
-    print(f"Nie znaleziono pliku {data_path}")
+    raise FileNotFoundError(f"Nie znaleziono pliku {data_path}")
