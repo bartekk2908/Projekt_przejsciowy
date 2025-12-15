@@ -5,7 +5,7 @@ import xgboost as xgb
 import lightgbm as lgb
 import time
 from sklearn.metrics import mean_absolute_error, root_mean_squared_error, r2_score
-
+import numpy as np
 
 
 def load_data():
@@ -97,12 +97,16 @@ def evaluate_model(model, X_test, y_test, name="Model"):
     rmse = root_mean_squared_error(y_test, preds)
     mae = mean_absolute_error(y_test, preds)
     r2 = r2_score(y_test, preds)
+    mape = np.mean(np.abs((y_test - preds) / y_test)) * 100
+    within_10 = np.mean(np.abs(preds - y_test) / y_test <= 0.10) * 100
     
     print(f"\nWyniki dla {name}:")
     print(f"RMSE (błąd średniokwadratowy): {rmse:.2f} [PLN]")
     print(f"MAE (średni błąd bezwzględny): {mae:.2f} [PLN]")
+    print(f"MAPE (średni błąd względny): {mape:.2f} [%]")
     print(f"R2 Score (dopasowanie): {r2:.4f}")
-    
+    print(f"{within_10:.1f}% ofert wyceniono z dokładnością ±10%")
+
     return preds
 
 
@@ -112,14 +116,15 @@ if __name__ == "__main__":
     
     X, y = prepare_features(df)
     
-    # Podział na zbiór treningowy i testowy (80% / 20%)
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
-    print(f"\nZbiór treningowy: {X_train.shape}\nZbiór testowy: {X_test.shape}")
+    # Podział na zbiór treningowy, walidacyjny i testowy (70% / 15% / 15%)
+    X_train, X_temp, y_train, y_temp = train_test_split(X, y, test_size=0.3, random_state=42)
+    X_val, X_test, y_val, y_test = train_test_split(X_temp, y_temp, test_size=0.5, random_state=42)
+    print(f"\nZbiór treningowy: {X_train.shape}\nZbiór walidacyjny: {X_val.shape}\nZbiór testowy: {X_test.shape}")
     
     # XGBoost
-    xgb_model = train_xgboost(X_train, y_train, X_test, y_test)
+    xgb_model = train_xgboost(X_train, y_train, X_val, y_val)
     evaluate_model(xgb_model, X_test, y_test, "XGBoost")
     
     # LightGBM
-    lgb_model = train_lightgbm(X_train, y_train, X_test, y_test)
+    lgb_model = train_lightgbm(X_train, y_train, X_val, y_val)
     evaluate_model(lgb_model, X_test, y_test, "LightGBM")
