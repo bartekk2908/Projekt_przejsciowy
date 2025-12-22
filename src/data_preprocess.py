@@ -45,7 +45,7 @@ def load_and_preprocess_data(data_path):
 
 
 def save_preprocessed_data(df):
-    """ Funkcja zapisuje data frame do 'data/processed/dataset.parquet'. """
+    """ Funkcja zapisuje data frame do pliku parquet """
 
     current_dir = os.path.dirname(os.path.abspath(__file__))
     project_root = os.path.dirname(current_dir)
