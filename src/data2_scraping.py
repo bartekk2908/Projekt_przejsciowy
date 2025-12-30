@@ -104,12 +104,12 @@ def scrape_deweloperuch(number_of_pages = None, transaction_type=None):
                     
                     record = {
                         "ID": full_id,
-                        "Udział": share_text,
+                        "Udzial": share_text,
                         "Adres": adress_text,
                         "Miasto": city_text,
-                        "Metraż": cols[2].get_text(strip=True),
+                        "Metraz": cols[2].get_text(strip=True),
                         "Pokoje": cols[3].get_text(strip=True),
-                        "Piętro": cols[4].get_text(strip=True),
+                        "Pietro": cols[4].get_text(strip=True),
                         "Cena": cols[6].get_text(strip=True),
                         "Data_transakcji": cols[7].get_text(strip=True)
                     }
@@ -169,6 +169,8 @@ if __name__ == "__main__":
 
     # Jak jest number_of_pages=None to sprawdza ile jest i scrapuje wszystkie 
     # Dostępne typy transakcji: 'transakcja', 'transakcjaBonifikata', 'transakcjaHurt'
+    # (transakcje z bonifikatą to takie że ktoś wynajmował długo dane mieszkanie i dostaje ofertę kupna na niższą kwotę np przez państwo;
+    # transakcje hurtowe też zazwyczaj mają niższą kwotę niż kupijąc pojedyńczo)
     scrapped_data = scrape_deweloperuch(number_of_pages=None, transaction_type=['transakcja'])
     
     save_to_csv(scrapped_data, output_file="deweloperuch_1.csv")

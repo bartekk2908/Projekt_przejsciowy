@@ -44,21 +44,21 @@ def load_and_preprocess_data(data_path):
     return full_df
 
 
-def save_preprocessed_data(df):
+def save_preprocessed_data(df, output_filename="dataset.parquet"):
     """ Funkcja zapisuje data frame do pliku parquet """
-
+    
     current_dir = os.path.dirname(os.path.abspath(__file__))
     project_root = os.path.dirname(current_dir)
-    data_dir = os.path.join(project_root, 'data', 'processed')
+    output_dir = os.path.join(project_root, 'data', 'processed')
 
     # Tworzymy folder data jeśli nie istnieje
-    if not os.path.exists(data_dir):
-        os.makedirs(data_dir)
-
-    output_file = os.path.join(data_dir, "dataset.parquet")
-    df.to_parquet(output_file, index=False)
+    if not os.path.exists(output_dir):
+        os.makedirs(output_dir)
     
-    print(f"Zapisano dataset w: {output_file}")
+    output_path = os.path.join(output_dir, output_filename)
+    df.to_parquet(output_path, index=False)
+
+    print(f"Zapisano przetworzony dataset w: {output_path}")
     print(f"Rozmiar: {df.shape}")
 
 
