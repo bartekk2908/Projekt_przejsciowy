@@ -2,7 +2,7 @@ import os
 import pandas as pd
 import numpy as np
 
-from data_preprocess import save_preprocessed_data
+from data1_preprocess import save_preprocessed_data
 
 
 def _clean_currency(val):
@@ -45,7 +45,7 @@ def load_and_preprocess_scrapped_data(input_filename):
     project_root = os.path.dirname(current_dir)
     input_path = os.path.join(project_root, 'data', 'scrapped', input_filename)
     if not os.path.exists(input_path):
-        raise FileNotFoundError(f"Nie znaleziono pliku: {input_path}")
+        print(f"Nie znaleziono pliku: {input_path}")
 
     print(f"Wczytywanie danych z: {input_path}")
     df = pd.read_csv(input_path)

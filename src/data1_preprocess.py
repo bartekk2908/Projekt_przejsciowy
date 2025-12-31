@@ -2,7 +2,7 @@ import os
 import glob
 import pandas as pd
 
-from data_download import data_download
+from data1_download import data_download
 
 
 def load_and_preprocess_data(data_path):
@@ -12,11 +12,26 @@ def load_and_preprocess_data(data_path):
     search_pattern = os.path.join(data_path, "apartments_pl_*.csv")
     files = glob.glob(search_pattern)
     if not files:
-        raise FileNotFoundError(f"Nie znaleziono plików sprzedaży w: {data_path}")
+        print(f"Nie znaleziono plików sprzedaży w: {data_path}")
     print(f"Znaleziono {len(files)} plików sprzedaży.")
     
-    # Scalanie plików csv do jednego df
-    df_list = [pd.read_csv(f) for f in files]
+    # Wczytywanie plików csv i zapisywanie rok i miesiąc z nazwy
+    df_list = []
+    for f in files:
+        temp_df = pd.read_csv(f)
+        filename = os.path.basename(f)
+        parts = filename.split('_')
+        try:
+            year = int(parts[-2])
+            month = int(parts[-1].replace('.csv', ''))
+            temp_df['month'] = month
+            temp_df['year'] = year
+        except (IndexError, ValueError):
+            print(f"Nie udało się wyciągnąć daty z pliku: {filename}")
+        
+        df_list.append(temp_df)
+
+    # Scalanie wczytanych plików csv do jednego df
     full_df = pd.concat(df_list, ignore_index=True)
     
     # Usuwanie duplikatów (ta sama oferta w różnych miesiącach)
